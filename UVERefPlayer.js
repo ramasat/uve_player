@@ -139,6 +139,11 @@ var defaultInitConfig = {
     preferredSubtitleLanguage: "en",
 
     /**
+     * on tune rate
+     */
+    //onTuneRate: 1,
+
+    /**
      *  network proxy to use (Format <SCHEME>://<PROXY IP:PROXY PORT>)
      */
     //networkProxy: string;
@@ -222,12 +227,7 @@ var defaultInitConfig = {
      * max attempts for init frag curl timeout failures
      */
     //initFragmentRetryCount: 3
-
-    /**
-     * used to enable/disable license caching
-     */
-    //setLicenseCaching: false,
-
+    
     /**
      * Enabling use of matching base url, whenever there are multiple base urls are available, 
      * with this option base url for which host of main tune url if matching is selected, 
@@ -310,12 +310,10 @@ function playbackStateChanged(event) {
             break;
         case playerStatesEnum.initialized:
             playerState = playerStatesEnum.initialized;
-            var audioTracksAvailable = playerObj.getAvailableAudioTracks();
-            var textTracksAvailable = playerObj.getAvailableTextTracks();
-            console.log("Available audio tracks: " + audioTracksAvailable);
-            console.log("Available text tracks: " + textTracksAvailable);
+            console.log("Available audio tracks: " + playerObj.getAvailableAudioTracks());
+            console.log("Available text tracks: " + playerObj.getAvailableTextTracks());
 
-            if(textTracksAvailable != undefined)
+            if(playerObj.getAvailableTextTracks() != undefined)
             {
                 // Remove exsisting options in list
                 if(ccTracks.options.length) {
@@ -324,7 +322,7 @@ function playbackStateChanged(event) {
                     }
                 }
 
-                var textTrackList = JSON.parse(textTracksAvailable);
+                var textTrackList = JSON.parse((playerObj.getAvailableTextTracks()));
                 // Parse only the closed captioning tracks
                 var closedCaptioningList = [];
                 for(track=0; track<textTrackList.length;track++) {
@@ -343,26 +341,6 @@ function playbackStateChanged(event) {
                     }
                     option.text = closedCaptioningList[trackNo-1];
                     ccTracks.add(option);
-                }
-            }
-
-            if(audioTracksAvailable != undefined)
-            {
-                // Remove exsisting options in list
-                if(audioTracks.options.length) {
-                    for(itemIndex = audioTracks.options.length; itemIndex >= 0; itemIndex--) {
-                        audioTracks.remove(itemIndex);
-                    }
-                }
-
-                var audioTrackList = JSON.parse(audioTracksAvailable);
-
-                // Iteratively adding all the options to audioTracks
-                for (var trackNo = 0; trackNo < audioTrackList.length; trackNo++) {
-                    var option = document.createElement("option");
-                    option.value = trackNo;
-                    option.text = audioTrackList[trackNo].language + " " + audioTrackList[trackNo].rendition;
-                    audioTracks.add(option);
                 }
             }
 
@@ -424,9 +402,9 @@ function mediaSpeedChanged(event) {
         }
 
         if (currentRate === 1) {
-            document.getElementById("playOrPauseIcon").src = "../icons/pause.png";
+            document.getElementById("playOrPauseIcon").src = "icons/pause.png";
         } else {
-            document.getElementById("playOrPauseIcon").src = "../icons/play.png";
+            document.getElementById("playOrPauseIcon").src = "icons/play.png";
         }
     }
 }
@@ -639,7 +617,7 @@ function checkNextAd(position) {
 }
 
 function mediaPlaybackStarted() {
-    document.getElementById("playOrPauseIcon").src = "../icons/pause.png";
+    document.getElementById("playOrPauseIcon").src = "icons/pause.png";
 
     var availableVBitrates = playerObj.getVideoBitrates();
     if (availableVBitrates !== undefined) {
